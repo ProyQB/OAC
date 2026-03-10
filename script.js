@@ -132,9 +132,9 @@ async function handleSignup(e){
 
 e.preventDefault();
 
-const name = document.getElementById('signup-name').value;
-const email = document.getElementById('signup-email').value;
-const password = document.getElementById('signup-password').value;
+const name = document.getElementById('full_name').value;
+const email = document.getElementById('email').value;
+//const password = document.getElementById('signup-password').value;
 
 const { data, error } = await sb.auth.signUp({
 email,
