@@ -108,9 +108,16 @@ async function handleSignup(e) {
         email, password, options: { data: { full_name: name } }
     });
 
-    if (error) {
+ /*   if (error) {
         document.getElementById('signup-error').textContent = error.message;
-    } else {
+    } */
+    
+    if (error) {
+    console.error(error);
+    document.getElementById('signup-error').textContent = error.message;
+}
+    
+    else {
         showSuccess('Check your email for the confirmation link!');
         closeLoginModal();
     }
