@@ -4,9 +4,9 @@ const SUPABASE_KEY = "sb_publishable_ZV5TQ1ywOUmB2hPM5DZtnQ_Sgt77oq6";
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const products = [
-    { id: 1, name: 'Classic Hoodie', category: 'hoodies', price: 49.99, description: 'Comfortable and warm hoodie', emoji: '👕', sizes: ['S', 'M', 'L', 'XL'] },
-    { id: 2, name: 'Premium Sweatpants', category: 'sweats', price: 39.99, description: 'Soft stylish sweats', emoji: '👖', sizes: ['S', 'M', 'L', 'XL'] },
-    { id: 3, name: 'Graphic T-Shirt', category: 'shirts', price: 24.99, description: 'Trendy graphic design', emoji: '👕', sizes: ['S', 'M', 'L', 'XL'] }
+    { id: 1, name: 'ORC Yin-Yang Hoodie', category: 'hoodies', price: 75.00, description: 'Comfortable and warm hoodie', image: 'https://qrugfdvdhaxvjqtruzzq.supabase.co/storage/v1/object/public/product-images/Gemini_Generated_Image_6uier16uier16uie.png', sizes: ['S', 'M', 'L', 'XL'] },
+    { id: 2, name: 'ORC Monogram Sweats', category: 'sweats', price: 65.00, description: 'Soft stylish sweats', image: 'https://qrugfdvdhaxvjqtruzzq.supabase.co/storage/v1/object/public/product-images/Gemini_Generated_Image_te1a9lte1a9lte1a.png', sizes: ['S', 'M', 'L', 'XL'] },
+    { id: 3, name: 'ORC Distressed Wide Tee', category: 'shirts', price: 45.00, description: 'Trendy graphic design', image: 'https://qrugfdvdhaxvjqtruzzq.supabase.co/storage/v1/object/public/product-images/Gemini_Generated_Image_fzqo6kfzqo6kfzqo.png', sizes: ['S', 'M', 'L', 'XL'] }
 ];
 
 let cart = [];
