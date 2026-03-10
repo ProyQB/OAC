@@ -105,22 +105,25 @@ async function handleSignup(e) {
     const password = document.getElementById('signup-password').value;
 
     const { data, error } = await sb.auth.signUp({
-        email, password, options: { data: { full_name: name } }
-    });
+  email,
+  password,
+  options: { data: { full_name: name } }
+});
 
- /*   if (error) {
-        document.getElementById('signup-error').textContent = error.message;
-    } */
-    
-    if (error) {
-    console.error(error);
-    document.getElementById('signup-error').textContent = error.message;
+if (error) {
+  console.error(error);
+  document.getElementById('signup-error').textContent = error.message;
+  return;
 }
-    
-    else {
-        showSuccess('Check your email for the confirmation link!');
-        closeLoginModal();
-    }
+
+if (data.user) {
+  const { error: insertError } = await sb.from('users').insert({
+    id: data.user.id,
+    full_name: name,
+    email: email
+  });
+
+  if (insertError) console.error(insertError);
 }
 
 async function handleLogin(e) {
