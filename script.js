@@ -176,25 +176,27 @@ async function handleSignup(e){
 
   console.log("Signup started");
 
-  const name = document.getElementById('full_name')?.value;
-  const email = document.getElementById('email')?.value;
+  const name = document.getElementById('signup-name')?.value;
+  const email = document.getElementById('signup-email')?.value;
   const password = document.getElementById('signup-password')?.value;
 
-  console.log("Form values:", { name, email, passwordLength: password?.length });
+  console.log("Form values:", {
+    name,
+    email,
+    passwordLength: password?.length
+  });
 
   if(!name || !email || !password){
     console.error("Missing fields");
-    alert("All fields required");
+    alert("All signup fields are required");
     return;
   }
 
   try{
 
-    console.log("Calling Supabase auth.signUp...");
-
     const { data, error } = await sb.auth.signUp({
-      email: email,
-      password: password,
+      email,
+      password,
       options:{
         data:{ full_name: name }
       }
@@ -203,41 +205,35 @@ async function handleSignup(e){
     console.log("Signup response:", data);
 
     if(error){
-      console.error("AUTH ERROR:", error);
-      alert("Signup failed: " + error.message);
+      console.error("Signup error:", error);
+      alert(error.message);
       return;
     }
 
-    if(!data.user){
-      console.error("No user returned from signup");
+    const user = data.user;
+
+    if(!user){
+      console.error("No user returned");
       return;
     }
 
-    console.log("User created:", data.user.id);
-
-    console.log("Inserting profile row...");
-
-    const { data:profileData, error:profileError } =
-      await sb.from('users').insert({
-        id: data.user.id,
+    const { error: profileError } = await sb
+      .from('users')
+      .insert({
+        id: user.id,
         full_name: name,
         email: email
       });
 
     if(profileError){
-      console.error("PROFILE INSERT ERROR:", profileError);
-      alert("Profile insert failed: " + profileError.message);
-      return;
+      console.error("Profile insert error:", profileError);
     }
 
-    console.log("Profile created:", profileData);
-
-    alert("Signup successful!");
+    alert("Account created successfully");
 
   }catch(err){
 
-    console.error("Unexpected signup error:", err);
-    alert("Unexpected error during signup");
+    console.error("Unexpected error:", err);
 
   }
 
