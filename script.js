@@ -128,7 +128,7 @@ setTimeout(()=>logo.style.textShadow="none",150);
 }
 
 // SIGNUP (UPDATED VERSION)
-async function handleSignup(e){
+/*async function handleSignup(e){
 
 e.preventDefault();
 
@@ -167,6 +167,79 @@ showSuccess("Account created!");
 closeLoginModal();
 
 }
+
+}*/
+
+async function handleSignup(e){
+
+  e.preventDefault();
+
+  console.log("Signup started");
+
+  const name = document.getElementById('full_name')?.value;
+  const email = document.getElementById('email')?.value;
+  const password = document.getElementById('signup-password')?.value;
+
+  console.log("Form values:", { name, email, passwordLength: password?.length });
+
+  if(!name || !email || !password){
+    console.error("Missing fields");
+    alert("All fields required");
+    return;
+  }
+
+  try{
+
+    console.log("Calling Supabase auth.signUp...");
+
+    const { data, error } = await sb.auth.signUp({
+      email: email,
+      password: password,
+      options:{
+        data:{ full_name: name }
+      }
+    });
+
+    console.log("Signup response:", data);
+
+    if(error){
+      console.error("AUTH ERROR:", error);
+      alert("Signup failed: " + error.message);
+      return;
+    }
+
+    if(!data.user){
+      console.error("No user returned from signup");
+      return;
+    }
+
+    console.log("User created:", data.user.id);
+
+    console.log("Inserting profile row...");
+
+    const { data:profileData, error:profileError } =
+      await sb.from('users').insert({
+        id: data.user.id,
+        full_name: name,
+        email: email
+      });
+
+    if(profileError){
+      console.error("PROFILE INSERT ERROR:", profileError);
+      alert("Profile insert failed: " + profileError.message);
+      return;
+    }
+
+    console.log("Profile created:", profileData);
+
+    alert("Signup successful!");
+
+  }catch(err){
+
+    console.error("Unexpected signup error:", err);
+    alert("Unexpected error during signup");
+
+  }
 
 }
 
