@@ -4,9 +4,33 @@ const SUPABASE_KEY = "sb_publishable_ZV5TQ1ywOUmB2hPM5DZtnQ_Sgt77oq6";
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 const products = [
-    { id: 1, name: 'ORC Yin-Yang Hoodie', category: 'hoodies', price: 75.00, description: 'Comfortable and warm hoodie', image: 'https://qrugfdvdhaxvjqtruzzq.supabase.co/storage/v1/object/public/product-images/Gemini_Generated_Image_6uier16uier16uie.png', sizes: ['S', 'M', 'L', 'XL'] },
-    { id: 2, name: 'ORC Monogram Sweats', category: 'sweats', price: 65.00, description: 'Soft stylish sweats', image: 'https://qrugfdvdhaxvjqtruzzq.supabase.co/storage/v1/object/public/product-images/Gemini_Generated_Image_te1a9lte1a9lte1a.png', sizes: ['S', 'M', 'L', 'XL'] },
-    { id: 3, name: 'ORC Distressed Wide Tee', category: 'shirts', price: 45.00, description: 'Trendy graphic design', image: 'https://qrugfdvdhaxvjqtruzzq.supabase.co/storage/v1/object/public/product-images/Gemini_Generated_Image_fzqo6kfzqo6kfzqo.png', sizes: ['S', 'M', 'L', 'XL'] }
+    { 
+        id: 1, 
+        name: 'ORC Yin-Yang Hoodie', 
+        category: 'hoodies', 
+        price: 75.00, 
+        description: 'Faded grey heavyweight fleece with center-chest Yin-Yang monogram.', 
+        image: 'https://qrugfdvdhaxvjqtruzzq.supabase.co/storage/v1/object/public/product-images/Gemini_Generated_Image_6uier16uier16uie.png', 
+        sizes: ['S', 'M', 'L', 'XL'] 
+    },
+    { 
+        id: 2, 
+        name: 'ORC Distressed Wide Tee', 
+        category: 'shirts', 
+        price: 45.00, 
+        description: 'Faded black boxy-fit tee with side-seam distressing and monogram detail.', 
+        image: 'https://qrugfdvdhaxvjqtruzzq.supabase.co/storage/v1/object/public/product-images/Gemini_Generated_Image_fzqo6kfzqo6kfzqo.png', 
+        sizes: ['S', 'M', 'L', 'XL'] 
+    },
+    { 
+        id: 3, 
+        name: 'ORC Monogram Sweats', 
+        category: 'sweats', 
+        price: 65.00, 
+        description: 'Matching faded grey fleece with "ORC" monogram bunched pattern.', 
+        image: 'https://qrugfdvdhaxvjqtruzzq.supabase.co/storage/v1/object/public/product-images/Gemini_Generated_Image_te1a9lte1a9lte1a.png', 
+        sizes: ['S', 'M', 'L', 'XL'] 
+    }
 ];
 
 let cart = [];
@@ -15,6 +39,7 @@ let currentUser = null;
 document.addEventListener('DOMContentLoaded', async function() {
     loadProducts();
     setupEventListeners();
+    initLogoAnimation(); // Added logo pulse effect
     
     // Check for existing session on load
     const { data: { session } } = await sb.auth.getSession();
@@ -37,12 +62,14 @@ function loadProducts() {
     const container = document.getElementById('products-container');
     container.innerHTML = products.map(product => `
         <div class="product-card">
-            <div class="product-image">${product.emoji}</div>
+            <div class="product-image">
+                <img src="${product.image}" alt="${product.name}" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
             <div class="product-info">
                 <p class="product-category">${product.category}</p>
                 <h3 class="product-name">${product.name}</h3>
                 <p class="product-description">${product.description}</p>
-                <p class="product-price">$${product.price}</p>
+                <p class="product-price">$${product.price.toFixed(2)}</p>
                 <div class="product-sizes" id="sizes-${product.id}">
                     ${product.sizes.map(size => `<button class="size-btn" data-size="${size}" onclick="selectSize(this, ${product.id})">${size}</button>`).join('')}
                 </div>
@@ -55,6 +82,19 @@ function loadProducts() {
 function selectSize(element, productId) {
     document.querySelectorAll(`#sizes-${productId} .size-btn`).forEach(btn => btn.classList.remove('active'));
     element.classList.add('active');
+}
+
+// STENCIL LOGO ANIMATION
+function initLogoAnimation() {
+    const logo = document.querySelector('.logo');
+    if (logo) {
+        setInterval(() => {
+            logo.style.textShadow = "0 0 15px rgba(255,255,255,0.8)";
+            setTimeout(() => {
+                logo.style.textShadow = "none";
+            }, 150);
+        }, 3000);
+    }
 }
 
 // AUTH FUNCTIONS (SUPABASE)
@@ -157,7 +197,8 @@ async function removeFromCart(dbId) {
 
 // UI HELPERS
 function updateCartCount() {
-    document.getElementById('cart-count').textContent = cart.length;
+    const el = document.getElementById('cart-count');
+    if (el) el.textContent = cart.length;
 }
 
 function loadCartItems() {
@@ -190,7 +231,7 @@ function updateAuthMenu() {
         : `<a href="#login" class="nav-link" onclick="showLoginModal()">Login</a>`;
 }
 
-// MODAL CONTROLS (Your original UI logic)
+// MODAL CONTROLS
 function showLoginModal() { document.getElementById('login-modal').classList.add('active'); }
 function closeLoginModal() { document.getElementById('login-modal').classList.remove('active'); }
 function openCartModal() { loadCartItems(); document.getElementById('cart-modal').classList.add('active'); }
@@ -214,7 +255,6 @@ function proceedToCheckout() {
 
 async function handleCheckout(e) {
     e.preventDefault();
-    // Simulate successful payment
     await sb.from('cart_items').delete().eq('user_id', currentUser.id);
     cart = [];
     updateCartCount();
