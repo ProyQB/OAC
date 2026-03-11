@@ -69,29 +69,26 @@ openCartModal();
 }
 
 // PRODUCT LOADING
-function loadProducts(){
-
-const container = document.getElementById('products-container');
-
-container.innerHTML = products.map(product=>`
-
-<div class="product-card">
-
-<div class="product-image">
-<img src="${product.image}" style="width:100%;height:100%;object-fit:cover;">
-</div>
-
-<div class="product-info">
-
-<p class="product-category">${product.category}</p>
-<h3 class="product-name">${product.name}</h3>
-<p class="product-description">${product.description}</p>
-<p class="product-price">$${product.price.toFixed(2)}</p>
-
-<div class="product-sizes" id="sizes-${product.id}">
-${product.sizes.map(size=>`
-<button class="size-btn" data-size="${size}" onclick="selectSize(this,${product.id})">${size}</button>
-`).join('')}
+function loadProducts() {
+    const container = document.getElementById('products-container');
+    container.innerHTML = products.map(product => `
+        <div class="product-card">
+            <div class="product-image">
+                <img src="${product.image}" alt="${product.name}" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+            <div class="product-info">
+                <p class="product-category">${product.category}</p>
+                <h3 class="product-name">${product.name}</h3>
+                <p class="product-description">${product.description}</p>
+                <p class="product-price">$${product.price.toFixed(2)}</p>
+                <div class="product-sizes" id="sizes-${product.id}">
+                    ${product.sizes.map(size => `<button class="size-btn" data-size="${size}" onclick="selectSize(this, ${product.id})">${size}</button>`).join('')}
+                </div>
+                <button class="add-to-cart" onclick="addToCart(${product.id})">Add to Cart</button>
+            </div>
+        </div>
+    `).join('');
+}
 </div>
 
 <button class="add-to-cart" onclick="addToCart(${product.id})">Add to Cart</button>
