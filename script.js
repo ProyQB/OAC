@@ -5,33 +5,69 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // PRODUCTS
 const products = [
-{
-id: 1,
-name: 'ORC Yin-Yang Hoodie',
-category: 'hoodies',
-price: 75.00,
-description: 'Faded grey heavyweight fleece with center-chest Yin-Yang monogram.',
-image: 'https://qrugfdvdhaxvjqtruzzq.supabase.co/storage/v1/object/public/product-images/Gemini_Generated_Image_6uier16uier16uie.png',
-sizes: ['S','M','L','XL']
-},
-{
-id: 2,
-name: 'ORC Distressed Wide Tee',
-category: 'shirts',
-price: 45.00,
-description: 'Faded black boxy-fit tee with side-seam distressing and monogram detail.',
-image: 'https://qrugfdvdhaxvjqtruzzq.supabase.co/storage/v1/object/public/product-images/Gemini_Generated_Image_fzqo6kfzqo6kfzqo.png',
-sizes: ['S','M','L','XL']
-},
-{
-id: 3,
-name: 'ORC Monogram Sweats',
-category: 'sweats',
-price: 65.00,
-description: 'Matching faded grey fleece with "ORC" monogram bunched pattern.',
-image: 'https://qrugfdvdhaxvjqtruzzq.supabase.co/storage/v1/object/public/product-images/Gemini_Generated_Image_te1a9lte1a9lte1a.png',
-sizes: ['S','M','L','XL']
-}
+    {
+        id: 1,
+        name: 'ORC Yin-Yang Hoodie',
+        category: 'hoodies',
+        price: 75.00,
+        description: 'Faded grey heavyweight fleece with center-chest Yin-Yang monogram.',
+        image: 'https://qrugfdvdhaxvjqtruzzq.supabase.co/storage/v1/object/public/product-images/Gemini_Generated_Image_6uier16uier16uie.png',
+        sizes: ['S','M','L','XL']
+    },
+    {
+        id: 2,
+        name: 'ORC Distressed Wide Tee',
+        category: 'shirts',
+        price: 45.00,
+        description: 'Faded black boxy-fit tee with side-seam distressing and monogram detail.',
+        image: 'https://qrugfdvdhaxvjqtruzzq.supabase.co/storage/v1/object/public/product-images/Gemini_Generated_Image_fzqo6kfzqo6kfzqo.png',
+        sizes: ['S','M','L','XL']
+    },
+    {
+        id: 3,
+        name: 'ORC Monogram Sweats',
+        category: 'sweats',
+        price: 65.00,
+        description: 'Matching faded grey fleece with "ORC" monogram bunched pattern.',
+        image: 'https://qrugfdvdhaxvjqtruzzq.supabase.co/storage/v1/object/public/product-images/Gemini_Generated_Image_te1a9lte1a9lte1a.png',
+        sizes: ['S','M','L','XL']
+    },
+    { 
+        id: 4, 
+        name: 'ORC Side-Stripe Sweats', 
+        category: 'sweats', 
+        price: 85.00, 
+        description: 'Acid-wash black wide-leg sweats with cream logo side-striping and branded long drawstrings.', 
+        image: 'https://qrugfdvdhaxvjqtruzzq.supabase.co/storage/v1/object/public/product-images/Gemini_Generated_Image_e0m25oe0m25oe0m2.png', 
+        sizes: ['S', 'M', 'L', 'XL'] 
+    },
+    { 
+        id: 5, 
+        name: 'ORC Embroidered Denim', 
+        category: 'jeans', 
+        price: 110.00, 
+        description: 'Baggy black acid-wash denim featuring heavy grey ORC embroidery over distressing.', 
+        image: 'https://qrugfdvdhaxvjqtruzzq.supabase.co/storage/v1/object/public/product-images/Gemini_Generated_Image_lnsc6xlnsc6xlnsc.png', 
+        sizes: ['30', '32', '34', '36'] 
+    },
+    { 
+        id: 6, 
+        name: 'ORC Blue Acid-Wash Denim', 
+        category: 'jeans', 
+        price: 95.00, 
+        description: 'Distressed blue acid-wash baggy jeans with reinforced stitching and industrial detailing.', 
+        image: 'https://qrugfdvdhaxvjqtruzzq.supabase.co/storage/v1/object/public/product-images/Gemini_Generated_Image_2lgu822lgu822lgu.png', 
+        sizes: ['30', '32', '34', '36'] 
+    },
+    { 
+        id: 7, 
+        name: 'ORC Stencil Beanie', 
+        category: 'accessories', 
+        price: 35.00, 
+        description: 'Hand-teared ribbed knit beanie with faded ORC stencil patch.', 
+        image: 'https://qrugfdvdhaxvjqtruzzq.supabase.co/storage/v1/object/public/product-images/Gemini_Generated_Image_rmsyglrmsyglrmsy.png', 
+        sizes: ['OS'] 
+    }
 ];
 
 let cart = [];
