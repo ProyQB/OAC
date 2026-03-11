@@ -54,7 +54,7 @@ const products = [
         id: 6, 
         name: 'ORC Blue Acid-Wash Denim', 
         category: 'jeans', 
-        price: 95.00, 
+        price: 110.00, 
         description: 'Distressed blue acid-wash baggy jeans with reinforced stitching and industrial detailing.', 
         image: 'https://qrugfdvdhaxvjqtruzzq.supabase.co/storage/v1/object/public/product-images/Gemini_Generated_Image_2lgu822lgu822lgu.png', 
         sizes: ['30', '32', '34', '36'] 
