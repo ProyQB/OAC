@@ -3,78 +3,23 @@ const SUPABASE_URL = "https://qrugfdvdhaxvjqtruzzq.supabase.co";
 const SUPABASE_KEY = "sb_publishable_ZV5TQ1ywOUmB2hPM5DZtnQ_Sgt77oq6";
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// PRODUCTS
+// PRODUCTS (Note: Once you run the SQL I gave you, this array can be deleted)
 const products = [
-    {
-        id: 1,
-        name: 'ORC Yin-Yang Hoodie',
-        category: 'hoodies',
-        price: 75.00,
-        description: 'Faded grey heavyweight fleece with center-chest Yin-Yang monogram.',
-        image: 'https://qrugfdvdhaxvjqtruzzq.supabase.co/storage/v1/object/public/product-images/Gemini_Generated_Image_6uier16uier16uie.png',
-        sizes: ['S','M','L','XL']
-    },
-    {
-        id: 2,
-        name: 'ORC Distressed Wide Tee',
-        category: 'shirts',
-        price: 45.00,
-        description: 'Faded black boxy-fit tee with side-seam distressing and monogram detail.',
-        image: 'https://qrugfdvdhaxvjqtruzzq.supabase.co/storage/v1/object/public/product-images/Gemini_Generated_Image_fzqo6kfzqo6kfzqo.png',
-        sizes: ['S','M','L','XL']
-    },
-    {
-        id: 3,
-        name: 'ORC Monogram Sweats',
-        category: 'sweats',
-        price: 65.00,
-        description: 'Matching faded grey fleece with "ORC" monogram bunched pattern.',
-        image: 'https://qrugfdvdhaxvjqtruzzq.supabase.co/storage/v1/object/public/product-images/Gemini_Generated_Image_te1a9lte1a9lte1a.png',
-        sizes: ['S','M','L','XL']
-    },
-    { 
-        id: 4, 
-        name: 'ORC Side-Stripe Sweats', 
-        category: 'sweats', 
-        price: 85.00, 
-        description: 'Acid-wash black wide-leg sweats with cream logo side-striping and branded long drawstrings.', 
-        image: 'https://qrugfdvdhaxvjqtruzzq.supabase.co/storage/v1/object/public/product-images/Gemini_Generated_Image_e0m25oe0m25oe0m2.png', 
-        sizes: ['S', 'M', 'L', 'XL'] 
-    },
-    { 
-        id: 5, 
-        name: 'ORC Embroidered Denim', 
-        category: 'jeans', 
-        price: 110.00, 
-        description: 'Baggy black acid-wash denim featuring heavy grey ORC embroidery over distressing.', 
-        image: 'https://qrugfdvdhaxvjqtruzzq.supabase.co/storage/v1/object/public/product-images/Gemini_Generated_Image_lnsc6xlnsc6xlnsc.png', 
-        sizes: ['30', '32', '34', '36'] 
-    },
-    { 
-        id: 6, 
-        name: 'ORC Blue Acid-Wash Denim', 
-        category: 'jeans', 
-        price: 95.00, 
-        description: 'Distressed blue acid-wash baggy jeans with reinforced stitching and industrial detailing.', 
-        image: 'https://qrugfdvdhaxvjqtruzzq.supabase.co/storage/v1/object/public/product-images/Gemini_Generated_Image_2lgu822lgu822lgu.png', 
-        sizes: ['30', '32', '34', '36'] 
-    },
-    { 
-        id: 7, 
-        name: 'ORC Stencil Beanie', 
-        category: 'accessories', 
-        price: 35.00, 
-        description: 'Hand-teared ribbed knit beanie with faded ORC stencil patch.', 
-        image: 'https://qrugfdvdhaxvjqtruzzq.supabase.co/storage/v1/object/public/product-images/Gemini_Generated_Image_rmsyglrmsyglrmsy.png', 
-        sizes: ['OS'] 
-    }
+    { id: 1, name: 'ORC Yin-Yang Hoodie', category: 'hoodies', price: 75.00, description: 'Faded grey heavyweight fleece with center-chest Yin-Yang monogram.', image: 'https://qrugfdvdhaxvjqtruzzq.supabase.co/storage/v1/object/public/product-images/Gemini_Generated_Image_6uier16uier16uie.png', sizes: ['S','M','L','XL'] },
+    { id: 2, name: 'ORC Distressed Wide Tee', category: 'shirts', price: 45.00, description: 'Faded black boxy-fit tee with side-seam distressing and monogram detail.', image: 'https://qrugfdvdhaxvjqtruzzq.supabase.co/storage/v1/object/public/product-images/Gemini_Generated_Image_fzqo6kfzqo6kfzqo.png', sizes: ['S','M','L','XL'] },
+    { id: 3, name: 'ORC Monogram Sweats', category: 'sweats', price: 65.00, description: 'Matching faded grey fleece with "ORC" monogram bunched pattern.', image: 'https://qrugfdvdhaxvjqtruzzq.supabase.co/storage/v1/object/public/product-images/Gemini_Generated_Image_te1a9lte1a9lte1a.png', sizes: ['S','M','L','XL'] },
+    { id: 4, name: 'ORC Side-Stripe Sweats', category: 'sweats', price: 85.00, description: 'Acid-wash black wide-leg sweats with cream logo side-striping and branded long drawstrings.', image: 'https://qrugfdvdhaxvjqtruzzq.supabase.co/storage/v1/object/public/product-images/Gemini_Generated_Image_e0m25oe0m25oe0m2.png', sizes: ['S', 'M', 'L', 'XL'] },
+    { id: 5, name: 'ORC Embroidered Denim', category: 'jeans', price: 110.00, description: 'Baggy black acid-wash denim featuring heavy grey ORC embroidery over distressing.', image: 'https://qrugfdvdhaxvjqtruzzq.supabase.co/storage/v1/object/public/product-images/Gemini_Generated_Image_lnsc6xlnsc6xlnsc.png', sizes: ['30', '32', '34', '36'] },
+    { id: 6, name: 'ORC Blue Acid-Wash Denim', category: 'jeans', price: 95.00, description: 'Distressed blue acid-wash baggy jeans with reinforced stitching and industrial detailing.', image: 'https://qrugfdvdhaxvjqtruzzq.supabase.co/storage/v1/object/public/product-images/Gemini_Generated_Image_2lgu822lgu822lgu.png', sizes: ['30', '32', '34', '36'] },
+    { id: 7, name: 'ORC Stencil Beanie', category: 'accessories', price: 35.00, description: 'Hand-teared ribbed knit beanie with faded ORC stencil patch.', image: 'https://qrugfdvdhaxvjqtruzzq.supabase.co/storage/v1/object/public/product-images/Gemini_Generated_Image_rmsyglrmsyglrmsy.png', sizes: ['OS'] }
 ];
 
 let cart = [];
 let currentUser = null;
 
+// MODIFIED: Added call to filterProducts('') to load all products from Supabase on start
 document.addEventListener('DOMContentLoaded', async function() {
-    loadProducts();
+    filterProducts(''); // NEW: Fetches initial products from Supabase
     setupEventListeners();
     initLogoAnimation();
     
@@ -93,10 +38,12 @@ function setupEventListeners() {
     document.querySelector('.cart-link').addEventListener('click', (e) => { e.preventDefault(); openCartModal(); });
 }
 
-function loadProducts() {
+// MODIFIED: Refactored to accept a list of products so search can use it too
+function renderProductGrid(items) {
     const container = document.getElementById('products-container');
     if (!container) return;
-    container.innerHTML = products.map(product => `
+    
+    container.innerHTML = items.map(product => `
         <div class="product-card">
             <div class="product-image">
                 <img src="${product.image}" alt="${product.name}" style="width: 100%; height: 100%; object-fit: cover;">
@@ -105,7 +52,7 @@ function loadProducts() {
                 <p class="product-category">${product.category}</p>
                 <h3 class="product-name">${product.name}</h3>
                 <p class="product-description">${product.description}</p>
-                <p class="product-price">$${product.price.toFixed(2)}</p>
+                <p class="product-price">$${Number(product.price).toFixed(2)}</p>
                 <div class="product-sizes" id="sizes-${product.id}">
                     ${product.sizes.map(size => `<button class="size-btn" data-size="${size}" onclick="selectSize(this, ${product.id})">${size}</button>`).join('')}
                 </div>
@@ -115,6 +62,12 @@ function loadProducts() {
     `).join('');
 }
 
+// OLD loadProducts simplified
+function loadProducts() {
+    renderProductGrid(products);
+}
+
+// --- REMAINING ORIGINAL FUNCTIONS (Login, Cart, etc.) ---
 function selectSize(element, productId) {
     document.querySelectorAll(`#sizes-${productId} .size-btn`).forEach(btn => btn.classList.remove('active'));
     element.classList.add('active');
@@ -165,10 +118,14 @@ async function loadCartFromSupabase() {
 
 async function addToCart(productId) {
     if (!currentUser) { showError('Please login'); showLoginModal(); return; }
-    const product = products.find(p => p.id === productId);
+    
+    // We try to find in local array first, if not there, we assume it's from Supabase
+    let product = products.find(p => p.id === productId);
+    
     const sizeBtn = document.querySelector(`#sizes-${productId} .size-btn.active`);
     if (!sizeBtn) { showError('Please select a size'); return; }
     const size = sizeBtn.getAttribute('data-size');
+
     const { data, error } = await sb.from('cart_items').insert([{
         user_id: currentUser.id, product_id: productId, product_name: product.name,
         price: product.price, size: size, quantity: 1
@@ -250,3 +207,38 @@ function showSuccess(msg) {
 }
 
 function showError(msg) { alert(msg); }
+
+// --- NEW SUPABASE SEARCH & SCROLL FUNCTIONS ---
+
+// NEW: This fixes the "scrollToShop is not defined" error
+function scrollToShop() {
+    const shopSection = document.getElementById('shop');
+    if (shopSection) {
+        shopSection.scrollIntoView({ behavior: 'smooth' });
+    }
+}
+
+// NEW: This fixes the "filterProducts is not defined" error and uses Supabase
+async function filterProducts() {
+    const searchInput = document.getElementById('search-input');
+    const searchTerm = searchInput ? searchInput.value : '';
+    const container = document.getElementById('products-container');
+
+    // Show loading state
+    container.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">Searching ORC inventory...</p>';
+
+    const { data: filtered, error } = await sb
+        .from('products')
+        .select('*')
+        .or(`name.ilike.%${searchTerm}%,category.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%`);
+
+    if (error) {
+        console.error("Search Error:", error.message);
+        // Fallback to local products if table isn't ready
+        const localItems = products.filter(p => p.name.toLowerCase().includes(searchTerm.toLowerCase()));
+        renderProductGrid(localItems);
+        return;
+    }
+
+    renderProductGrid(filtered);
+}
