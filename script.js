@@ -38,12 +38,37 @@ function setupEventListeners() {
     document.querySelector('.cart-link').addEventListener('click', (e) => { e.preventDefault(); openCartModal(); });
 }
 
-// MODIFIED: Refactored to accept a list of products so search can use it too
-function renderProductGrid(items) {
+// 1. Fix the ReferenceError for the "Start Shopping" button
+function scrollToShop() {
+    const shopSection = document.getElementById('shop');
+    if (shopSection) {
+        shopSection.scrollIntoView({ behavior: 'smooth' });
+    }
+}
+
+// 2. Fix the ReferenceError and data-mapping for Search
+async function filterProducts() {
+    const searchTerm = document.getElementById('search-input').value;
     const container = document.getElementById('products-container');
-    if (!container) return;
-    
-    container.innerHTML = items.map(product => `
+
+    // Query Supabase - searching 'name' and 'category' columns from your screenshot
+    const { data: products, error } = await sb
+        .from('products')
+        .select('*')
+        .or(`name.ilike.%${searchTerm}%,category.ilike.%${searchTerm}%`);
+
+    if (error) {
+        console.error("Supabase Error:", error.message);
+        return;
+    }
+
+    if (!products || products.length === 0) {
+        container.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">No items found.</p>';
+        return;
+    }
+
+    // Render the cards using columns from your screenshot: name, category, price, image
+    container.innerHTML = products.map(product => `
         <div class="product-card">
             <div class="product-image">
                 <img src="${product.image}" alt="${product.name}" style="width: 100%; height: 100%; object-fit: cover;">
@@ -51,12 +76,14 @@ function renderProductGrid(items) {
             <div class="product-info">
                 <p class="product-category">${product.category}</p>
                 <h3 class="product-name">${product.name}</h3>
-                <p class="product-description">${product.description}</p>
+                <p class="product-description">${product.description || ''}</p>
                 <p class="product-price">$${Number(product.price).toFixed(2)}</p>
                 <div class="product-sizes" id="sizes-${product.id}">
-                    ${product.sizes.map(size => `<button class="size-btn" data-size="${size}" onclick="selectSize(this, ${product.id})">${size}</button>`).join('')}
+                    ${(product.sizes || ['OS']).map(size => `
+                        <button class="size-btn" data-size="${size}" onclick="selectSize(this, ${product.id})">${size}</button>
+                    `).join('')}
                 </div>
-                <button class="add-to-cart" onclick="addToCart(${product.id})">Add to Cart</button>
+                <button class="add-to-cart" onclick="addToCart(${product.id}, '${product.name}', ${product.price})">Add to Cart</button>
             </div>
         </div>
     `).join('');
