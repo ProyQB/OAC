@@ -62,18 +62,15 @@ async function filterProducts() {
         return;
     }
 
-    // This is the missing function causing the error
-function renderProductGrid(items) {
+    function renderProductGrid(items) {
     const container = document.getElementById('products-container');
     if (!container) return;
     
-    // If no products were found in Supabase
     if (!items || items.length === 0) {
-        container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 2rem;">No items found in ORC collection.</p>';
+        container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 2rem;">No items found in the collection.</p>';
         return;
     }
 
-    // Build the HTML for each product card
     container.innerHTML = items.map(product => `
         <div class="product-card">
             <div class="product-image">
@@ -85,7 +82,8 @@ function renderProductGrid(items) {
                 <p class="product-description">${product.description || ''}</p>
                 <p class="product-price">$${Number(product.price).toFixed(2)}</p>
                 <div class="product-sizes" id="sizes-${product.id}">
-                    ${(product.sizes || ['OS']).map(size => `
+                    ${/* DYNAMIC FIX: This reads the exact array from your screenshot */
+                      product.sizes.map(size => `
                         <button class="size-btn" data-size="${size}" onclick="selectSize(this, ${product.id})">${size}</button>
                     `).join('')}
                 </div>
