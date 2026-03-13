@@ -62,13 +62,19 @@ async function filterProducts() {
         return;
     }
 
-    if (!products || products.length === 0) {
-        container.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">No items found.</p>';
+    // This is the missing function causing the error
+function renderProductGrid(items) {
+    const container = document.getElementById('products-container');
+    if (!container) return;
+    
+    // If no products were found in Supabase
+    if (!items || items.length === 0) {
+        container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; padding: 2rem;">No items found in ORC collection.</p>';
         return;
     }
 
-    // Render the cards using columns from your screenshot: name, category, price, image
-    container.innerHTML = products.map(product => `
+    // Build the HTML for each product card
+    container.innerHTML = items.map(product => `
         <div class="product-card">
             <div class="product-image">
                 <img src="${product.image}" alt="${product.name}" style="width: 100%; height: 100%; object-fit: cover;">
@@ -83,7 +89,7 @@ async function filterProducts() {
                         <button class="size-btn" data-size="${size}" onclick="selectSize(this, ${product.id})">${size}</button>
                     `).join('')}
                 </div>
-                <button class="add-to-cart" onclick="addToCart(${product.id}, '${product.name}', ${product.price})">Add to Cart</button>
+                <button class="add-to-cart" onclick="addToCart(${product.id}, '${product.name.replace(/'/g, "\\'")}', ${product.price})">Add to Cart</button>
             </div>
         </div>
     `).join('');
