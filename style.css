@@ -332,5 +332,38 @@ body {
     border: none;
     cursor: pointer;
 }
+.designer-container {
+    max-width: 800px; /* Wider to fit tools + canvas */
+    background-color: #1a1a1a; /* Match your brand's dark theme */
+    color: white;
+}
 
+.designer-layout {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 30px;
+    padding: 20px;
+}
+
+.designer-tools {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    min-width: 150px;
+}
+
+.designer-tools button {
+    border-radius: 4px;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.canvas-wrapper {
+    border: 1px solid #333;
+    border-radius: 8px;
+    overflow: hidden;
+    background: white; /* Contrast for the hoodie image */
+}
 .btn-danger { background: #ff4444 !important; }
