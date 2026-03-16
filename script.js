@@ -241,3 +241,24 @@ async function saveDesign() {
     showSuccess("Design saved to your profile!");
     closeDesigner();
 }
+function openDesigner() {
+    document.getElementById('designer-modal').classList.add('active');
+    
+    if (!canvas) {
+        canvas = new fabric.Canvas('designCanvas');
+        
+        // Add a blank hoodie as the background
+        fabric.Image.fromURL('https://p7.hiclipart.com/preview/130/507/584/t-shirt-hoodie-gildan-activewear-clothing-t-shirt.jpg', function(img) {
+            // Scale the image to fit your 400x450 canvas
+            img.scaleToWidth(400);
+            img.set({
+                left: 0,
+                top: 0,
+                selectable: false, // User can't move the hoodie
+                evented: false     // User can't click the hoodie
+            });
+            canvas.add(img);
+            canvas.sendToBack(img);
+        }, { crossOrigin: 'anonymous' }); // Required to avoid security errors when saving
+    }
+}
