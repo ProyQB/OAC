@@ -109,5 +109,24 @@
     </div>
 
     <script src="script.js"></script>
+    <div id="designer-modal" class="modal">
+    <div class="modal-content designer-container">
+        <span class="close" onclick="closeDesigner()">&times;</span>
+        <h2>Design Your Piece</h2>
+        
+        <div class="designer-layout">
+            <div class="designer-tools">
+                <button onclick="addText()">Add Text</button>
+                <input type="color" id="text-color" onchange="changeColor(this.value)" value="#ffffff">
+                <button onclick="deleteObject()" class="btn-danger">Delete Selection</button>
+                <button onclick="saveDesign()" class="auth-btn">Save & List for Sale</button>
+            </div>
+
+            <div class="canvas-wrapper">
+                <canvas id="designCanvas" width="400" height="450"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
 </body>
 </html>
