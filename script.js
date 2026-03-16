@@ -205,50 +205,19 @@ function closeDesigner() {
     document.getElementById('designer-modal').classList.remove('active');
 }
 
-function addText() {
-    const text = new fabric.IText('ORC - EDIT ME', {
-        left: 100,
-        top: 100,
-        fontFamily: 'Arial',
-        fill: document.getElementById('text-color').value,
-        fontSize: 20
-    });
-    canvas.add(text);
-    canvas.setActiveObject(text);
-}
+function addBrandLogo() {
+    // Replace with the URL of your stored brand logo
+    const logoUrl = 'YOUR_SUPABASE_LOGO_URL_HERE';
 
-function changeColor(color) {
-    const active = canvas.getActiveObject();
-    if (active) {
-        active.set('fill', color);
-        canvas.renderAll();
-    }
+    fabric.Image.fromURL(logoUrl, function(img) {
+        img.scaleToWidth(100);
+        img.set({
+            left: 150,
+            top: 150,
+            cornerColor: '#ff6b35',
+            cornerSize: 8
+        });
+        canvas.add(img);
+        canvas.setActiveObject(img);
+    }, { crossOrigin: 'anonymous' });
 }
-
-function deleteObject() {
-    const active = canvas.getActiveObject();
-    if (active) {
-        canvas.remove(active);
-    }
-}
-
-async function saveDesign() {
-    // 1. Export canvas to Image
-    const dataURL = canvas.toDataURL({ format: 'png', quality: 1 });
-    
-    // 2. Here you would call the Supabase upload logic we discussed earlier
-    console.log("Saving design...", dataURL);
-    showSuccess("Design saved to your profile!");
-    closeDesigner();
-}
-fabric.Image.fromURL('https://www.pngarts.com/files/11/Blank-Black-Hoodie-Front-View-PNG-Image.png', function(img) {
-    img.scaleToWidth(350); // Slightly smaller to fit better
-    img.set({
-        left: 25,
-        top: 40,
-        selectable: false,
-        evented: false
-    });
-    canvas.add(img);
-    canvas.sendToBack(img);
-}, { crossOrigin: 'anonymous' });
