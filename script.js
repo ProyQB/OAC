@@ -1,7 +1,7 @@
 // SUPABASE CONFIGURATION
 const SUPABASE_URL = "https://qrugfdvdhaxvjqtruzzq.supabase.co";
 const SUPABASE_KEY = "sb_publishable_ZV5TQ1ywOUmB2hPM5DZtnQ_Sgt77oq6";
-const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY); 
 
 let cart = [];
 let currentUser = null;
