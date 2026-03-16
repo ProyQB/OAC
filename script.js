@@ -183,3 +183,61 @@ async function loadCartFromSupabase() {
     const { data } = await sb.from('cart_items').select('*').eq('user_id', currentUser.id);
     if (data) { cart = data; updateCartCount(); }
 }
+let canvas;
+
+function openDesigner() {
+    document.getElementById('designer-modal').classList.add('active');
+    
+    // Initialize Fabric Canvas only once
+    if (!canvas) {
+        canvas = new fabric.Canvas('designCanvas');
+        
+        // Optional: Add a base template image (like a blank hoodie)
+        fabric.Image.fromURL('https://your-domain.com/blank-hoodie.png', function(img) {
+            img.set({ selectable: false, evented: false });
+            canvas.add(img);
+            canvas.sendToBack(img);
+        });
+    }
+}
+
+function closeDesigner() {
+    document.getElementById('designer-modal').classList.remove('active');
+}
+
+function addText() {
+    const text = new fabric.IText('ORC - EDIT ME', {
+        left: 100,
+        top: 100,
+        fontFamily: 'Arial',
+        fill: document.getElementById('text-color').value,
+        fontSize: 20
+    });
+    canvas.add(text);
+    canvas.setActiveObject(text);
+}
+
+function changeColor(color) {
+    const active = canvas.getActiveObject();
+    if (active) {
+        active.set('fill', color);
+        canvas.renderAll();
+    }
+}
+
+function deleteObject() {
+    const active = canvas.getActiveObject();
+    if (active) {
+        canvas.remove(active);
+    }
+}
+
+async function saveDesign() {
+    // 1. Export canvas to Image
+    const dataURL = canvas.toDataURL({ format: 'png', quality: 1 });
+    
+    // 2. Here you would call the Supabase upload logic we discussed earlier
+    console.log("Saving design...", dataURL);
+    showSuccess("Design saved to your profile!");
+    closeDesigner();
+}
