@@ -275,18 +275,37 @@ function changeBaseProduct() {
     const product = document.getElementById('product-select').value;
     let imageUrl = '';
 
-    // These use your confirmed Supabase storage paths
-    if (product === 'hoodie') imageUrl = 'https://qrugfdvdhaxvjqtruzzq.supabase.co/storage/v1/object/public/product-images/Gemini_Generated_Image_6uier16uier16uie.png';
-    if (product === 'shirt') imageUrl = 'https://qrugfdvdhaxvjqtruzzq.supabase.co/storage/v1/object/public/product-images/Gemini_Generated_Image_fzqo6kfzqo6kfzqo.png';
-    if (product === 'beanie') imageUrl = 'https://qrugfdvdhaxvjqtruzzq.supabase.co/storage/v1/object/public/product-images/Gemini_Generated_Image_rmsyglrmsyglrmsy.png';
+    let canvas;
 
-    fabric.Image.fromURL(imageUrl, function(img) {
-        // Remove the old background image only
-        const objects = canvas.getObjects('image');
-        if (objects.length > 0) canvas.remove(objects[0]);
+const ORC_ASSETS = {
+    hoodie: 'https://qrugfdvdhaxvjqtruzzq.supabase.co/storage/v1/object/public/product-images/Gemini_Generated_Image_6uier16uier16uie.png',
+    shirt: 'https://qrugfdvdhaxvjqtruzzq.supabase.co/storage/v1/object/public/product-images/Gemini_Generated_Image_fzqo6kfzqo6kfzqo.png',
+    beanie: 'https://qrugfdvdhaxvjqtruzzq.supabase.co/storage/v1/object/public/product-images/Gemini_Generated_Image_rmsyglrmsyglrmsy.png'
+};
 
-        img.scaleToWidth(400);
-        img.set({ left: 0, top: 20, selectable: false, evented: false });
+function initCanvas() {
+    if (!canvas) {
+        canvas = new fabric.Canvas('designCanvas');
+        updateBaseImage(); // Load default hoodie
+    }
+}
+
+function updateBaseImage() {
+    const type = document.getElementById('product-select').value;
+    const url = ORC_ASSETS[type];
+
+    fabric.Image.fromURL(url, function(img) {
+        // Remove existing background images
+        canvas.getObjects('image').forEach(obj => {
+            if (!obj.isLogo) canvas.remove(obj);
+        });
+
+        img.set({
+            scaleX: canvas.width / img.width,
+            scaleY: canvas.height / img.height,
+            selectable: false,
+            evented: false
+        });
         
         canvas.add(img);
         canvas.sendToBack(img);
@@ -294,11 +313,41 @@ function changeBaseProduct() {
     }, { crossOrigin: 'anonymous' });
 }
 
-// 3. Simple delete function
-function deleteSelected() {
-    const activeObjects = canvas.getActiveObjects();
-    if (activeObjects.length) {
-        canvas.discardActiveObject();
-        activeObjects.forEach((obj) => canvas.remove(obj));
+function addText() {
+    const font = document.getElementById('font-select').value;
+    const color = document.getElementById('text-color').value;
+    
+    const text = new fabric.IText('ORC WEAR', {
+        left: 100,
+        top: 100,
+        fontFamily: font,
+        fill: color,
+        fontSize: 40,
+        fontWeight: 'bold'
+    });
+    
+    canvas.add(text);
+    canvas.setActiveObject(text);
+}
+
+function updateTextColor() {
+    const active = canvas.getActiveObject();
+    if (active && active.type === 'i-text') {
+        active.set('fill', document.getElementById('text-color').value);
+        canvas.renderAll();
     }
+}
+
+function deleteObject() {
+    const active = canvas.getActiveObject();
+    if (active) {
+        canvas.remove(active);
+        canvas.discardActiveObject();
+    }
+}
+
+function saveDesign() {
+    const dataURL = canvas.toDataURL({ format: 'png', quality: 1 });
+    // In a future step, we can upload this dataURL to Supabase
+    showSuccess('Design saved to your gallery!');
 }
