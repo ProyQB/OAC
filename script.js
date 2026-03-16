@@ -351,3 +351,32 @@ function saveDesign() {
     // In a future step, we can upload this dataURL to Supabase
     showSuccess('Design saved to your gallery!');
 }
+function handleLogoUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = function(f) {
+        const data = f.target.result;
+        
+        fabric.Image.fromURL(data, function(img) {
+            // Scale the logo to a reasonable starting size
+            img.scaleToWidth(100);
+            
+            img.set({
+                left: 175,
+                top: 150,
+                cornerColor: '#ff6b35', // Match your ORC secondary color
+                cornerStrokeColor: '#1a1a1a',
+                cornerSize: 10,
+                transparentCorners: false,
+                isLogo: true // Custom property so we don't delete it when switching products
+            });
+
+            canvas.add(img);
+            canvas.setActiveObject(img);
+            canvas.renderAll();
+        });
+    };
+    reader.readAsDataURL(file);
+}
