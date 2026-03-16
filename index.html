@@ -134,7 +134,12 @@
                 <button onclick="deleteObject()" class="btn-danger">Delete Selection</button>
                 <button onclick="saveDesign()" class="auth-btn">Save & List for Sale</button>
             </div>
+<div class="designer-tools">
+    <label>Add Branding</label>
+    <input type="file" id="logo-upload" accept="image/*" style="display: none;" onchange="handleLogoUpload(event)">
+    <button onclick="document.getElementById('logo-upload').click()" class="auth-btn">UPLOAD LOGO</button>
 
+    </div>
             <div class="canvas-wrapper">
                 <canvas id="designCanvas" width="400" height="450"></canvas>
             </div>
