@@ -251,3 +251,54 @@ function openDesigner() {
         canvas.renderAll(); // Force the browser to show the image immediately
     }, { crossOrigin: 'anonymous' });
 }
+// 1. Function to actually add text to the canvas
+function addText() {
+    if (!canvas) return;
+
+    const color = document.getElementById('text-color').value;
+    const text = new fabric.IText('TYPE HERE', {
+        left: 150,
+        top: 150,
+        fontFamily: 'helvetica',
+        fill: color,
+        fontSize: 30,
+        fontWeight: 'bold'
+    });
+
+    canvas.add(text);
+    canvas.setActiveObject(text);
+    canvas.renderAll();
+}
+
+// 2. Function to switch between your Supabase images
+function changeBaseProduct() {
+    const product = document.getElementById('product-select').value;
+    let imageUrl = '';
+
+    // These use your confirmed Supabase storage paths
+    if (product === 'hoodie') imageUrl = 'https://qrugfdvdhaxvjqtruzzq.supabase.co/storage/v1/object/public/product-images/Gemini_Generated_Image_6uier16uier16uie.png';
+    if (product === 'shirt') imageUrl = 'https://qrugfdvdhaxvjqtruzzq.supabase.co/storage/v1/object/public/product-images/Gemini_Generated_Image_fzqo6kfzqo6kfzqo.png';
+    if (product === 'beanie') imageUrl = 'https://qrugfdvdhaxvjqtruzzq.supabase.co/storage/v1/object/public/product-images/Gemini_Generated_Image_rmsyglrmsyglrmsy.png';
+
+    fabric.Image.fromURL(imageUrl, function(img) {
+        // Remove the old background image only
+        const objects = canvas.getObjects('image');
+        if (objects.length > 0) canvas.remove(objects[0]);
+
+        img.scaleToWidth(400);
+        img.set({ left: 0, top: 20, selectable: false, evented: false });
+        
+        canvas.add(img);
+        canvas.sendToBack(img);
+        canvas.renderAll();
+    }, { crossOrigin: 'anonymous' });
+}
+
+// 3. Simple delete function
+function deleteSelected() {
+    const activeObjects = canvas.getActiveObjects();
+    if (activeObjects.length) {
+        canvas.discardActiveObject();
+        activeObjects.forEach((obj) => canvas.remove(obj));
+    }
+}
