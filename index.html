@@ -82,7 +82,19 @@
             </div>
         </div>
     </div>
-
+<div class="designer-tools">
+    <select id="product-select" onchange="changeBaseProduct()" class="input-field">
+        <option value="hoodie">ORC Hoodie</option>
+        <option value="shirt">ORC Graphic Tee</option>
+        <option value="beanie">ORC Beanie</option>
+    </select>
+    
+    <button onclick="addText()">ADD TEXT</button>
+    <input type="color" id="text-color" value="#ff6b35">
+    
+    <button onclick="deleteSelected()" class="remove-btn">DELETE SELECTION</button>
+    <button onclick="saveDesign()">SAVE & LIST FOR SALE</button>
+</div>
     <div id="checkout-modal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeCheckoutModal()">&times;</span>
