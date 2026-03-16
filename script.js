@@ -221,3 +221,33 @@ function addBrandLogo() {
         canvas.setActiveObject(img);
     }, { crossOrigin: 'anonymous' });
 }
+function openDesigner() {
+    document.getElementById('designer-modal').classList.add('active');
+    
+    if (!canvas) {
+        canvas = new fabric.Canvas('designCanvas', {
+            backgroundColor: '#ffffff'
+        });
+    }
+
+    // Use your specific Supabase storage URL
+    const hoodieUrl = 'https://qrugfdvdhaxvjqtruzzq.supabase.co/storage/v1/object/public/product-images/Gemini_Generated_Image_6uier16uier16uie.png';
+
+    fabric.Image.fromURL(hoodieUrl, function(img) {
+        // Clear previous background if re-opening
+        const objects = canvas.getObjects('image');
+        if (objects.length > 0) canvas.remove(objects[0]);
+
+        img.scaleToWidth(400);
+        img.set({
+            left: 0,
+            top: 20,
+            selectable: false,
+            evented: false
+        });
+        
+        canvas.add(img);
+        canvas.sendToBack(img);
+        canvas.renderAll(); // Force the browser to show the image immediately
+    }, { crossOrigin: 'anonymous' });
+}
