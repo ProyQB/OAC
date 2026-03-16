@@ -245,20 +245,21 @@ function openDesigner() {
     document.getElementById('designer-modal').classList.add('active');
     
     if (!canvas) {
-        canvas = new fabric.Canvas('designCanvas');
+        canvas = new fabric.Canvas('designCanvas', {
+            backgroundColor: '#ffffff' // Keeps the background clean
+        });
         
-        // Add a blank hoodie as the background
-        fabric.Image.fromURL('https://p7.hiclipart.com/preview/130/507/584/t-shirt-hoodie-gildan-activewear-clothing-t-shirt.jpg', function(img) {
-            // Scale the image to fit your 400x450 canvas
+        // Load a reliable blank hoodie template
+        fabric.Image.fromURL('https://i.imgur.com/8f8K8Xy.png', function(img) {
             img.scaleToWidth(400);
             img.set({
                 left: 0,
-                top: 0,
-                selectable: false, // User can't move the hoodie
-                evented: false     // User can't click the hoodie
+                top: 25, // Centers it slightly vertically
+                selectable: false,
+                evented: false
             });
             canvas.add(img);
             canvas.sendToBack(img);
-        }, { crossOrigin: 'anonymous' }); // Required to avoid security errors when saving
+        }, { crossOrigin: 'anonymous' });
     }
 }
