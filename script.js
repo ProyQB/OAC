@@ -241,25 +241,14 @@ async function saveDesign() {
     showSuccess("Design saved to your profile!");
     closeDesigner();
 }
-function openDesigner() {
-    document.getElementById('designer-modal').classList.add('active');
-    
-    if (!canvas) {
-        canvas = new fabric.Canvas('designCanvas', {
-            backgroundColor: '#ffffff' // Keeps the background clean
-        });
-        
-        // Load a reliable blank hoodie template
-        fabric.Image.fromURL('https://i.imgur.com/8f8K8Xy.png', function(img) {
-            img.scaleToWidth(400);
-            img.set({
-                left: 0,
-                top: 25, // Centers it slightly vertically
-                selectable: false,
-                evented: false
-            });
-            canvas.add(img);
-            canvas.sendToBack(img);
-        }, { crossOrigin: 'anonymous' });
-    }
-}
+fabric.Image.fromURL('https://www.pngarts.com/files/11/Blank-Black-Hoodie-Front-View-PNG-Image.png', function(img) {
+    img.scaleToWidth(350); // Slightly smaller to fit better
+    img.set({
+        left: 25,
+        top: 40,
+        selectable: false,
+        evented: false
+    });
+    canvas.add(img);
+    canvas.sendToBack(img);
+}, { crossOrigin: 'anonymous' });
