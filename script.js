@@ -205,3 +205,55 @@ function proceedToCheckout() {
 function closeCheckoutModal() {
     document.getElementById('checkout-modal').classList.remove('active');
 }
+
+// 1. Updated openCartModal to refresh the list every time it's clicked
+function openCartModal() {
+    renderCartItems(); // Call the drawing function
+    document.getElementById('cart-modal').classList.add('active');
+}
+
+// 2. The function that actually builds the cart list
+function renderCartItems() {
+    const cartContainer = document.getElementById('cart-items');
+    const totalElement = document.getElementById('cart-total');
+    
+    if (!cartContainer) return;
+
+    if (cart.length === 0) {
+        cartContainer.innerHTML = '<p>Your cart is empty.</p>';
+        totalElement.textContent = '0.00';
+        return;
+    }
+
+    let total = 0;
+    cartContainer.innerHTML = cart.map((item, index) => {
+        total += Number(item.price);
+        return `
+            <div class="cart-item" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #333; padding: 10px 0;">
+                <div>
+                    <h4 style="margin: 0;">${item.product_name}</h4>
+                    <p style="font-size: 0.8rem; color: #888;">Size: ${item.size}</p>
+                </div>
+                <div style="text-align: right;">
+                    <p style="font-weight: bold;">$${Number(item.price).toFixed(2)}</p>
+                    <button onclick="removeFromCart(${index}, ${item.id})" style="background: none; color: #ff4444; border: none; cursor: pointer; font-size: 0.7rem;">Remove</button>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    totalElement.textContent = total.toFixed(2);
+}
+
+// 3. Optional: Add a function to remove items
+async function removeFromCart(index, supabaseId) {
+    const { error } = await sb.from('cart_items').delete().eq('id', supabaseId);
+    
+    if (!error) {
+        cart.splice(index, 1); // Remove from the local array
+        updateCartCount();
+        renderCartItems(); // Refresh the list
+    } else {
+        alert("Could not remove item: " + error.message);
+    }
+}
