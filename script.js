@@ -184,3 +184,24 @@ async function handleCheckout(e) {
     alert('Purchase Successful!');
     document.getElementById('checkout-modal').classList.remove('active');
 }
+
+function proceedToCheckout() {
+    // 1. Close the cart modal
+    closeCartModal();
+    
+    // 2. Open the checkout modal
+    const checkoutModal = document.getElementById('checkout-modal');
+    if (checkoutModal) {
+        checkoutModal.classList.add('active');
+        
+        // 3. Update the total on the checkout page
+        const cartTotal = document.getElementById('cart-total').textContent;
+        document.getElementById('checkout-total').textContent = cartTotal;
+    } else {
+        alert("Checkout form is under maintenance.");
+    }
+}
+
+function closeCheckoutModal() {
+    document.getElementById('checkout-modal').classList.remove('active');
+}
