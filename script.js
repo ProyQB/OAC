@@ -1,4 +1,4 @@
-// SUPABASE CONFIGURATION
+// 1. CONFIGURATION & GLOBALS
 const SUPABASE_URL = "https://qrugfdvdhaxvjqtruzzq.supabase.co";
 const SUPABASE_KEY = "sb_publishable_ZV5TQ1ywOUmB2hPM5DZtnQ_Sgt77oq6";
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -6,12 +6,13 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let cart = [];
 let currentUser = null;
 
-// 1. INITIALIZATION
+// 2. INITIALIZATION
 document.addEventListener('DOMContentLoaded', async function() {
     await filterProducts(); 
     setupEventListeners();
     initLogoAnimation();
     
+    // Check for existing session
     const { data: { session } } = await sb.auth.getSession();
     if (session) {
         currentUser = session.user;
@@ -25,13 +26,12 @@ function setupEventListeners() {
     const signupForm = document.getElementById('signup-form');
     const checkoutForm = document.getElementById('checkout-form');
     
-    // These link the HTML forms to the JS functions below
     if(loginForm) loginForm.addEventListener('submit', handleLogin);
     if(signupForm) signupForm.addEventListener('submit', handleSignup);
     if(checkoutForm) checkoutForm.addEventListener('submit', handleCheckout);
 }
 
-// 2. PRODUCT & SEARCH LOGIC
+// 3. PRODUCT & SEARCH LOGIC
 async function filterProducts() {
     const searchInput = document.getElementById('search-input');
     const searchTerm = searchInput ? searchInput.value : '';
@@ -77,7 +77,42 @@ function selectSize(element, productId) {
     element.classList.add('active');
 }
 
-// 3. CART LOGIC
+// 4. CART & CHECKOUT LOGIC
+async function addToCart(productId, name, price) {
+    if (!currentUser) { 
+        showLoginModal();
+        return; 
+    }
+    
+    const sizeBtn = document.querySelector(`#sizes-${productId} .size-btn.active`);
+    if (!sizeBtn) { alert('Please select a size'); return; }
+    
+    const { data, error } = await sb.from('cart_items').insert([{
+        user_id: currentUser.id, 
+        product_id: productId, 
+        product_name: name,
+        price: price, 
+        size: sizeBtn.getAttribute('data-size'), 
+        quantity: 1
+    }]).select();
+    
+    if (!error) { 
+        cart.push(data[0]); 
+        updateCartCount(); 
+        alert('Added to cart!');
+    }
+}
+
+async function removeFromCart(index, supabaseId) {
+    // Note: Wrapped ID in quotes in the render function to prevent token errors
+    const { error } = await sb.from('cart_items').delete().eq('id', supabaseId);
+    if (!error) {
+        cart.splice(index, 1);
+        updateCartCount();
+        renderCartItems();
+    }
+}
+
 function renderCartItems() {
     const cartContainer = document.getElementById('cart-items');
     const totalElement = document.getElementById('cart-total');
@@ -109,40 +144,23 @@ function renderCartItems() {
     if(totalElement) totalElement.textContent = total.toFixed(2);
 }
 
-async function addToCart(productId, name, price) {
-    if (!currentUser) { 
-        showLoginModal();
-        return; 
-    }
-    const sizeBtn = document.querySelector(`#sizes-${productId} .size-btn.active`);
-    if (!sizeBtn) { alert('Please select a size'); return; }
-    
-    const { data, error } = await sb.from('cart_items').insert([{
-        user_id: currentUser.id, 
-        product_id: productId, 
-        product_name: name,
-        price: price, 
-        size: sizeBtn.getAttribute('data-size'), 
-        quantity: 1
-    }]).select();
-    
-    if (!error) { 
-        cart.push(data[0]); 
-        updateCartCount(); 
-        alert('Added to cart!');
+function proceedToCheckout() {
+    closeCartModal();
+    const checkoutModal = document.getElementById('checkout-modal');
+    if (checkoutModal) {
+        checkoutModal.classList.add('active');
+        const cartTotal = document.getElementById('cart-total').textContent;
+        document.getElementById('checkout-total').textContent = cartTotal;
     }
 }
 
-async function removeFromCart(index, supabaseId) {
-    const { error } = await sb.from('cart_items').delete().eq('id', supabaseId);
-    if (!error) {
-        cart.splice(index, 1);
-        updateCartCount();
-        renderCartItems();
-    }
+async function handleCheckout(e) {
+    e.preventDefault();
+    alert('Purchase Successful!');
+    closeCheckoutModal();
 }
 
-// 4. AUTH HANDLERS
+// 5. AUTH HANDLERS
 async function handleLogin(e) {
     e.preventDefault();
     const email = document.getElementById('login-email').value;
@@ -159,44 +177,22 @@ async function handleSignup(e) {
     if (error) alert(error.message); else alert('Check your email for confirmation!');
 }
 
-async function handleCheckout(e) {
-    e.preventDefault();
-    alert('Purchase Successful!');
-    closeCheckoutModal();
-}
-
 async function logout(e) {
     e.preventDefault();
     await sb.auth.signOut();
     location.reload();
 }
 
-// 5. UI & MODAL CONTROLS
+async function loadCartFromSupabase() {
+    const { data } = await sb.from('cart_items').select('*').eq('user_id', currentUser.id);
+    if (data) { cart = data; updateCartCount(); }
+}
+
+// 6. UI & MODAL CONTROLS
 function updateCartCount() { 
     const countEl = document.getElementById('cart-count');
     if(countEl) countEl.textContent = cart.length; 
 }
-
-function openCartModal() {
-    renderCartItems();
-    document.getElementById('cart-modal').classList.add('active');
-}
-
-function proceedToCheckout() {
-    closeCartModal();
-    const checkoutModal = document.getElementById('checkout-modal');
-    if (checkoutModal) {
-        checkoutModal.classList.add('active');
-        const cartTotal = document.getElementById('cart-total').textContent;
-        document.getElementById('checkout-total').textContent = cartTotal;
-    }
-}
-
-function closeCartModal() { document.getElementById('cart-modal').classList.remove('active'); }
-function showLoginModal() { document.getElementById('login-modal').classList.add('active'); }
-function closeLoginModal() { document.getElementById('login-modal').classList.remove('active'); }
-function closeCheckoutModal() { document.getElementById('checkout-modal').classList.remove('active'); }
-function scrollToShop() { document.getElementById('shop').scrollIntoView({ behavior: 'smooth' }); }
 
 function updateAuthMenu() {
     const menu = document.getElementById('auth-menu');
@@ -205,10 +201,16 @@ function updateAuthMenu() {
         : `<a href="#login" class="nav-link" onclick="showLoginModal()">Login</a>`;
 }
 
-async function loadCartFromSupabase() {
-    const { data } = await sb.from('cart_items').select('*').eq('user_id', currentUser.id);
-    if (data) { cart = data; updateCartCount(); }
+function openCartModal() {
+    renderCartItems();
+    document.getElementById('cart-modal').classList.add('active');
 }
+
+function closeCartModal() { document.getElementById('cart-modal').classList.remove('active'); }
+function showLoginModal() { document.getElementById('login-modal').classList.add('active'); }
+function closeLoginModal() { document.getElementById('login-modal').classList.remove('active'); }
+function closeCheckoutModal() { document.getElementById('checkout-modal').classList.remove('active'); }
+function scrollToShop() { document.getElementById('shop').scrollIntoView({ behavior: 'smooth' }); }
 
 function initLogoAnimation() {
     const logo = document.querySelector('.logo');
