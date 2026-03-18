@@ -25,6 +25,7 @@ function setupEventListeners() {
     const signupForm = document.getElementById('signup-form');
     const checkoutForm = document.getElementById('checkout-form');
     
+    // These link the HTML forms to the JS functions below
     if(loginForm) loginForm.addEventListener('submit', handleLogin);
     if(signupForm) signupForm.addEventListener('submit', handleSignup);
     if(checkoutForm) checkoutForm.addEventListener('submit', handleCheckout);
@@ -54,7 +55,7 @@ function renderProductGrid(items) {
     container.innerHTML = items.map(product => `
         <div class="product-card">
             <div class="product-image">
-                <img src="${product.image}" alt="${product.name}">
+                <img src="${product.image}" alt="${product.name}" style="width: 100%; height: 100%; object-fit: cover;">
             </div>
             <div class="product-info">
                 <p class="product-category">${product.category}</p>
@@ -76,7 +77,7 @@ function selectSize(element, productId) {
     element.classList.add('active');
 }
 
-// 3. CART RENDERING (The Fix for the "Token" error)
+// 3. CART LOGIC
 function renderCartItems() {
     const cartContainer = document.getElementById('cart-items');
     const totalElement = document.getElementById('cart-total');
@@ -91,7 +92,6 @@ function renderCartItems() {
     let total = 0;
     cartContainer.innerHTML = cart.map((item, index) => {
         total += Number(item.price);
-        // CRITICAL: We wrap item.id in single quotes '' to prevent Syntax Errors
         return `
             <div class="cart-item" style="display: flex; justify-content: space-between; border-bottom: 1px solid #333; padding: 10px 0;">
                 <div>
@@ -118,8 +118,12 @@ async function addToCart(productId, name, price) {
     if (!sizeBtn) { alert('Please select a size'); return; }
     
     const { data, error } = await sb.from('cart_items').insert([{
-        user_id: currentUser.id, product_id: productId, product_name: name,
-        price: price, size: sizeBtn.getAttribute('data-size'), quantity: 1
+        user_id: currentUser.id, 
+        product_id: productId, 
+        product_name: name,
+        price: price, 
+        size: sizeBtn.getAttribute('data-size'), 
+        quantity: 1
     }]).select();
     
     if (!error) { 
@@ -138,7 +142,41 @@ async function removeFromCart(index, supabaseId) {
     }
 }
 
-// 4. AUTH & MODALS
+// 4. AUTH HANDLERS
+async function handleLogin(e) {
+    e.preventDefault();
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+    const { error } = await sb.auth.signInWithPassword({ email, password });
+    if (error) alert(error.message); else location.reload();
+}
+
+async function handleSignup(e) {
+    e.preventDefault();
+    const email = document.getElementById('signup-email').value;
+    const password = document.getElementById('signup-password').value;
+    const { error } = await sb.auth.signUp({ email, password });
+    if (error) alert(error.message); else alert('Check your email for confirmation!');
+}
+
+async function handleCheckout(e) {
+    e.preventDefault();
+    alert('Purchase Successful!');
+    closeCheckoutModal();
+}
+
+async function logout(e) {
+    e.preventDefault();
+    await sb.auth.signOut();
+    location.reload();
+}
+
+// 5. UI & MODAL CONTROLS
+function updateCartCount() { 
+    const countEl = document.getElementById('cart-count');
+    if(countEl) countEl.textContent = cart.length; 
+}
+
 function openCartModal() {
     renderCartItems();
     document.getElementById('cart-modal').classList.add('active');
@@ -149,35 +187,16 @@ function proceedToCheckout() {
     const checkoutModal = document.getElementById('checkout-modal');
     if (checkoutModal) {
         checkoutModal.classList.add('active');
-        document.getElementById('checkout-total').textContent = document.getElementById('cart-total').textContent;
+        const cartTotal = document.getElementById('cart-total').textContent;
+        document.getElementById('checkout-total').textContent = cartTotal;
     }
 }
 
-// Helper functions (remain same)
-function updateCartCount() { document.getElementById('cart-count').textContent = cart.length; }
 function closeCartModal() { document.getElementById('cart-modal').classList.remove('active'); }
 function showLoginModal() { document.getElementById('login-modal').classList.add('active'); }
 function closeLoginModal() { document.getElementById('login-modal').classList.remove('active'); }
+function closeCheckoutModal() { document.getElementById('checkout-modal').classList.remove('active'); }
 function scrollToShop() { document.getElementById('shop').scrollIntoView({ behavior: 'smooth' }); }
-
-async function handleLogin(e) {
-    e.preventDefault();
-    const email = document.getElementById('login-email').value;
-    const password = document.getElementById('login-password').value;
-    const { error } = await sb.auth.signInWithPassword({ email, password });
-    if (error) alert(error.message); else location.reload();
-}
-
-async function loadCartFromSupabase() {
-    const { data } = await sb.from('cart_items').select('*').eq('user_id', currentUser.id);
-    if (data) { cart = data; updateCartCount(); }
-}
-
-async function handleCheckout(e) {
-    e.preventDefault();
-    alert('Purchase Successful!');
-    document.getElementById('checkout-modal').classList.remove('active');
-}
 
 function updateAuthMenu() {
     const menu = document.getElementById('auth-menu');
@@ -186,10 +205,9 @@ function updateAuthMenu() {
         : `<a href="#login" class="nav-link" onclick="showLoginModal()">Login</a>`;
 }
 
-async function logout(e) {
-    e.preventDefault();
-    await sb.auth.signOut();
-    location.reload();
+async function loadCartFromSupabase() {
+    const { data } = await sb.from('cart_items').select('*').eq('user_id', currentUser.id);
+    if (data) { cart = data; updateCartCount(); }
 }
 
 function initLogoAnimation() {
