@@ -1,4 +1,4 @@
-// 1. DATABASE SETUP
+// SUPABASE CONFIGURATION
 const SUPABASE_URL = "https://qrugfdvdhaxvjqtruzzq.supabase.co";
 const SUPABASE_KEY = "sb_publishable_ZV5TQ1ywOUmB2hPM5DZtnQ_Sgt77oq6";
 const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -6,12 +6,12 @@ const sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 let cart = [];
 let currentUser = null;
 
-// 2. APP STARTUP
+// 1. INITIALIZATION
 document.addEventListener('DOMContentLoaded', async function() {
-    await filterProducts(); 
+    await filterProducts(); // Load products from Supabase
     setupEventListeners();
+    initLogoAnimation();
     
-    // Check if a user is already logged in
     const { data: { session } } = await sb.auth.getSession();
     if (session) {
         currentUser = session.user;
@@ -28,9 +28,22 @@ function setupEventListeners() {
     if(loginForm) loginForm.addEventListener('submit', handleLogin);
     if(signupForm) signupForm.addEventListener('submit', handleSignup);
     if(checkoutForm) checkoutForm.addEventListener('submit', handleCheckout);
+    
+    const cartLink = document.querySelector('.cart-link');
+    if(cartLink) {
+        cartLink.addEventListener('click', (e) => { 
+            e.preventDefault(); 
+            openCartModal(); 
+        });
+    }
 }
 
-// 3. SHOPPING LOGIC
+// 2. PRODUCT & SEARCH LOGIC
+function scrollToShop() {
+    const shopSection = document.getElementById('shop');
+    if (shopSection) shopSection.scrollIntoView({ behavior: 'smooth' });
+}
+
 async function filterProducts() {
     const searchInput = document.getElementById('search-input');
     const searchTerm = searchInput ? searchInput.value : '';
@@ -40,25 +53,38 @@ async function filterProducts() {
         .select('*')
         .or(`name.ilike.%${searchTerm}%,category.ilike.%${searchTerm}%`);
 
-    if (!error) renderProductGrid(products);
+    if (error) {
+        console.error("Supabase Error:", error.message);
+        return;
+    }
+    renderProductGrid(products);
 }
 
 function renderProductGrid(items) {
     const container = document.getElementById('products-container');
     if (!container) return;
     
+    if (!items || items.length === 0) {
+        container.innerHTML = '<p style="grid-column: 1/-1; text-align: center;">No items found.</p>';
+        return;
+    }
+
     container.innerHTML = items.map(product => `
         <div class="product-card">
-            <div class="product-image"><img src="${product.image}" alt="${product.name}"></div>
+            <div class="product-image">
+                <img src="${product.image}" alt="${product.name}" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
             <div class="product-info">
-                <h3>${product.name}</h3>
-                <p>$${Number(product.price).toFixed(2)}</p>
+                <p class="product-category">${product.category}</p>
+                <h3 class="product-name">${product.name}</h3>
+                <p class="product-description">${product.description || ''}</p>
+                <p class="product-price">$${Number(product.price).toFixed(2)}</p>
                 <div class="product-sizes" id="sizes-${product.id}">
                     ${(product.sizes || []).map(size => `
                         <button class="size-btn" data-size="${size}" onclick="selectSize(this, ${product.id})">${size}</button>
                     `).join('')}
                 </div>
-                <button class="add-to-cart" onclick="addToCart(${product.id}, '${product.name}', ${product.price})">Add to Cart</button>
+                <button class="add-to-cart" onclick="addToCart(${product.id}, '${product.name.replace(/'/g, "\\'")}', ${product.price})">Add to Cart</button>
             </div>
         </div>
     `).join('');
@@ -69,63 +95,79 @@ function selectSize(element, productId) {
     element.classList.add('active');
 }
 
-// 4. CART & REMOVE LOGIC (Fixes the "Token" error)
-function renderCartItems() {
-    const cartContainer = document.getElementById('cart-items');
-    const totalElement = document.getElementById('cart-total');
-    if (!cartContainer) return;
-
-    if (cart.length === 0) {
-        cartContainer.innerHTML = '<p>Your cart is empty.</p>';
-        totalElement.textContent = '0.00';
-        return;
-    }
-
-    let total = 0;
-    cartContainer.innerHTML = cart.map((item, index) => {
-        total += Number(item.price);
-        // We use '${item.id}' with quotes to prevent the SyntaxError seen in your console
-        return `
-            <div class="cart-item" style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid #333;">
-                <div><h4>${item.product_name}</h4><p>Size: ${item.size}</p></div>
-                <div style="text-align:right;">
-                    <p>$${Number(item.price).toFixed(2)}</p>
-                    <button onclick="removeFromCart(${index}, '${item.id}')" style="color:red; background:none; border:none; cursor:pointer;">Remove</button>
-                </div>
-            </div>`;
-    }).join('');
-    totalElement.textContent = total.toFixed(2);
-}
-
+// 3. CART & AUTH LOGIC
 async function addToCart(productId, name, price) {
-    if (!currentUser) return showLoginModal();
+    if (!currentUser) { 
+        alert('Please login to shop'); 
+        showLoginModal();
+        return; 
+    }
+    
     const sizeBtn = document.querySelector(`#sizes-${productId} .size-btn.active`);
-    if (!sizeBtn) return alert('Select a size');
+    if (!sizeBtn) { alert('Please select a size'); return; }
+    const size = sizeBtn.getAttribute('data-size');
 
     const { data, error } = await sb.from('cart_items').insert([{
         user_id: currentUser.id, product_id: productId, product_name: name,
-        price: price, size: sizeBtn.getAttribute('data-size'), quantity: 1
+        price: price, size: size, quantity: 1
     }]).select();
     
-    if (!error) { cart.push(data[0]); updateCartCount(); alert('Added!'); }
-}
-
-async function removeFromCart(index, supabaseId) {
-    const { error } = await sb.from('cart_items').delete().eq('id', supabaseId);
-    if (!error) {
-        cart.splice(index, 1);
-        updateCartCount();
-        renderCartItems();
+    if (!error) { 
+        cart.push(data[0]); 
+        updateCartCount(); 
+        alert(`${name} added to cart!`);
     }
 }
 
-// 5. AUTH HANDLERS (Fixes "handleSignup is not defined")
+function updateCartCount() {
+    const el = document.getElementById('cart-count');
+    if (el) el.textContent = cart.length;
+}
+
+async function loadCartFromSupabase() {
+    if (!currentUser) return;
+    const { data } = await sb.from('cart_items').select('*').eq('user_id', currentUser.id);
+    if (data) { cart = data; updateCartCount(); }
+}
+
+// 4. UI & AUTH HELPERS
+function initLogoAnimation() {
+    const logo = document.querySelector('.logo');
+    if (logo) {
+        setInterval(() => {
+            logo.style.textShadow = "0 0 15px rgba(255,255,255,0.8)";
+            setTimeout(() => { logo.style.textShadow = "none"; }, 150);
+        }, 3000);
+    }
+}
+
+function updateAuthMenu() {
+    const menu = document.getElementById('auth-menu');
+    if (!menu) return;
+    menu.innerHTML = currentUser 
+        ? `<a href="#" class="nav-link" onclick="logout(event)">Logout</a>`
+        : `<a href="#login" class="nav-link" onclick="showLoginModal()">Login</a>`;
+}
+
+async function logout(e) {
+    e.preventDefault();
+    await sb.auth.signOut();
+    currentUser = null; cart = []; updateCartCount(); updateAuthMenu(); location.reload();
+}
+
+// MODAL CONTROLS
+function showLoginModal() { document.getElementById('login-modal').classList.add('active'); }
+function closeLoginModal() { document.getElementById('login-modal').classList.remove('active'); }
+function openCartModal() { document.getElementById('cart-modal').classList.add('active'); }
+function closeCartModal() { document.getElementById('cart-modal').classList.remove('active'); }
+
 async function handleLogin(e) {
     e.preventDefault();
     const email = document.getElementById('login-email').value;
     const password = document.getElementById('login-password').value;
-    const { error } = await sb.auth.signInWithPassword({ email, password });
-    if (error) alert(error.message); else location.reload();
+    const { data, error } = await sb.auth.signInWithPassword({ email, password });
+    if (error) { alert(error.message); } 
+    else { location.reload(); }
 }
 
 async function handleSignup(e) {
@@ -133,42 +175,12 @@ async function handleSignup(e) {
     const email = document.getElementById('signup-email').value;
     const password = document.getElementById('signup-password').value;
     const { error } = await sb.auth.signUp({ email, password });
-    if (error) alert(error.message); else alert('Check your email!');
-}
-
-async function logout(e) {
-    e.preventDefault();
-    await sb.auth.signOut();
-    location.reload();
-}
-
-// 6. UI & MODALS
-function updateCartCount() { document.getElementById('cart-count').textContent = cart.length; }
-function openCartModal() { renderCartItems(); document.getElementById('cart-modal').classList.add('active'); }
-function closeCartModal() { document.getElementById('cart-modal').classList.remove('active'); }
-function showLoginModal() { document.getElementById('login-modal').classList.add('active'); }
-function closeLoginModal() { document.getElementById('login-modal').classList.remove('active'); }
-
-function proceedToCheckout() {
-    closeCartModal();
-    document.getElementById('checkout-modal').classList.add('active');
-    document.getElementById('checkout-total').textContent = document.getElementById('cart-total').textContent;
+    if (error) { alert(error.message); } 
+    else { alert('Check your email for confirmation!'); }
 }
 
 async function handleCheckout(e) {
     e.preventDefault();
-    alert('Order Placed!');
+    alert('Purchase Successful!');
     document.getElementById('checkout-modal').classList.remove('active');
-}
-
-function updateAuthMenu() {
-    const menu = document.getElementById('auth-menu');
-    if (menu) menu.innerHTML = currentUser 
-        ? `<a href="#" onclick="logout(event)">Logout</a>`
-        : `<a href="#" onclick="showLoginModal()">Login</a>`;
-}
-
-async function loadCartFromSupabase() {
-    const { data } = await sb.from('cart_items').select('*').eq('user_id', currentUser.id);
-    if (data) { cart = data; updateCartCount(); }
 }
